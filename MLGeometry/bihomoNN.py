@@ -5,16 +5,19 @@ import tensorflow as tf
 
 __all__ = ['Bihomogeneous','Bihomogeneous_k2','Bihomogeneous_k3',
            'Bihomogeneous_k4','Dense','WidthOneDense']
+print("Hello from BihomoNN! Arbitrary dimension!")
 
 class Bihomogeneous(keras.layers.Layer):
     '''A layer transform zi to zi*zjbar'''
-    def __init__(self):
+    def __init__(self, dim):
         super(Bihomogeneous, self).__init__()
+        self.dim = dim
+
         
     def call(self, inputs):
         zzbar = tf.einsum('ai,aj->aij', inputs, tf.math.conj(inputs))
         zzbar = tf.linalg.band_part(zzbar, 0, -1)
-        zzbar = tf.reshape(zzbar, [-1, 25])
+        zzbar = tf.reshape(zzbar, [-1, self.dim**2]) #25])
         zzbar = tf.concat([tf.math.real(zzbar), tf.math.imag(zzbar)], axis=1)
         return remove_zero_entries(zzbar)
         
